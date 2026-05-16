@@ -11,25 +11,24 @@ import os, hashlib, struct, time, ctypes, fcntl
 # §1 PARAMÈTRES GLOBAUX
 # ──────────────────────────────────────────────────────────────────────────────
 
-n   = 256    # Degré du polynôme : les anneaux sont de dimension 256
-q   = 3329   # Module premier : q = 3329 (satisfait q ≡ 1 mod 256 pour la NTT)
-K   = 2      # Dimension du module : K=2 → Kyber-512, K=3 → Kyber-768, K=4 → Kyber-1024
+n   = 256    
+q   = 3329   
+K   = 2      
 
-eta1 = 3     # Paramètre de bruit pour s et e lors du keygen (distribution CBD)
-eta2 = 2     # Paramètre de bruit pour r, e1, e2 lors de l'encapsulation (distribution CBD)
-
-DU  = 10     # Nombre de bits de compression pour le vecteur u  (ciphertext)
-DV  = 4      # Nombre de bits de compression pour le polynôme v (ciphertext)
+eta1 = 3     
+eta2 = 2     
+DU  = 10     
+DV  = 4      
 
 
 # ──────────────────────────────────────────────────────────────────────────────
 # §2 CONSTRUCTION DE L'ANNEAU Rq = Zq[x] / (x^n + 1)
 # ──────────────────────────────────────────────────────────────────────────────
 
-Zq = GF(q)                       # Corps fini Z/qZ avec q=3329 éléments
-Px = PolynomialRing(Zq, 'x')     # Anneau de polynômes univariés à coefficients dans Zq
-x  = Px.gen()                    # Générateur symbolique x de l'anneau Px
-Rq = Px.quotient(x^n + 1, 'a')  # Anneau quotient Rq = Zq[x]/(x^256+1) ; 'a' est l'image de x
+Zq = GF(q)                       
+Px = PolynomialRing(Zq, 'x')     
+x  = Px.gen()                    
+Rq = Px.quotient(x^n + 1, 'a')  
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -37,13 +36,13 @@ Rq = Px.quotient(x^n + 1, 'a')  # Anneau quotient Rq = Zq[x]/(x^256+1) ; 'a' est
 # ──────────────────────────────────────────────────────────────────────────────
 
 def to_rq(lst):
-    return Rq(Px(list(lst)))           # Px(list(lst)) crée le polynôme, Rq() réduit modulo x^n+1
+    return Rq(Px(list(lst)))           
 
 
 def from_rq(p):
-    c = p.lift().list()                # .lift() remonte dans Px, .list() extrait les coefficients
-    c += [0] * (n - len(c))           # Complète avec des zéros si le polynôme est de degré < n-1
-    return [int(v) for v in c]        # Convertit chaque coefficient GF(q) en entier Python
+    c = p.lift().list()                
+    c += [0] * (n - len(c))           
+    return [int(v) for v in c]        
 
 
 # ── Constantes Linux perf_event (x86-64) ─────────────────────────────────────
